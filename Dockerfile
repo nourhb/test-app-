@@ -9,6 +9,8 @@ RUN npm ci --omit=dev
 COPY src ./src
 COPY public ./public
 
+RUN chmod -R 777 /app
+
 ENV PORT=3000
 
 EXPOSE 3000

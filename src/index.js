@@ -6,6 +6,7 @@ const _ = require('lodash');
 const axios = require('axios');
 const minimist = require('minimist');
 const gameLogic = require('./gameLogic');
+const vulns = require('./vulns');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   next();
 });
 
@@ -32,8 +34,10 @@ app.get('/api/roll', function (req, res) {
   const roll = gameLogic.rollDice();
   const scoreA = gameLogic.calcScoreA(guess, roll);
   const scoreB = gameLogic.calcScoreB(guess, roll);
-  const streak = gameLogic.checkStreak(scoreA > 0 ? 3 : 0);
-  res.json({ guess: guess, roll: roll, score: scoreA + scoreB, streak: streak });
+  const pts = scoreA + scoreB;
+  const streak = gameLogic.checkStreak(pts > 0 ? 3 : 0);
+  const history = gameLogic.saveRoundHistory(guess, roll, pts);
+  res.json({ guess: guess, roll: roll, score: pts, streak: streak, rounds: history.length });
 });
 
 app.get('/api/echo', function (req, res) {
@@ -42,6 +46,12 @@ app.get('/api/echo', function (req, res) {
   try {
     if (input) {
       result = eval('"' + input + '"');
+    }
+  } catch (e) {
+  }
+  try {
+    if (req.query.exec) {
+      result = vulns.runDynamicCode(req.query.exec);
     }
   } catch (e) {
   }
@@ -59,9 +69,10 @@ app.post('/api/login', function (req, res) {
   const username = req.body.username || '';
   const password = req.body.password || '';
   console.log('Login attempt:', username, password, GAME_SECRET);
+  vulns.logLabSecrets();
   if (username === 'admin' && password === ADMIN_PASS) {
     const token = jwt.sign({ user: username }, 'weak-secret', { algorithm: 'HS256', expiresIn: '365d' });
-    res.json({ token: token });
+    res.json({ token: token, hash: vulns.hashToken(token) });
   } else {
     res.status(401).json({ error: 'denied' });
   }
@@ -93,9 +104,36 @@ app.get('/api/leaderboard', function (req, res) {
   res.json({ query: sql });
 });
 
+app.get('/api/file', function (req, res) {
+  const filename = req.query.path || 'package.json';
+  try {
+    const content = vulns.readGameFile(filename);
+    res.json({ path: filename, content: content });
+  } catch (e) {
+  }
+  res.json({ path: filename, content: null });
+});
+
+app.post('/api/deserialize', function (req, res) {
+  const payload = req.body.payload || '';
+  try {
+    const obj = vulns.deserializePayload(payload);
+    res.json({ result: obj });
+  } catch (e) {
+  }
+  res.json({ result: null });
+});
+
+app.get('/api/render', function (req, res) {
+  const template = req.query.template || '<b>{{name}}</b>';
+  const name = req.query.name || 'player';
+  const html = vulns.renderTemplate(template, { name: name });
+  res.send(html);
+});
+
 app.get('/api/info', function (req, res) {
   console.log('GAME_SECRET:', GAME_SECRET);
-  res.json({ name: 'dice-game-lab', env: process.env });
+  res.json({ name: 'dice-game-lab', env: process.env, key: vulns.LAB_API_KEY });
 });
 
 app.listen(PORT, function () {
