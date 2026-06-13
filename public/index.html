@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Demo Lab</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Security <span>Demo Lab</span></h1>
+    <div class="status-pill">
+      <div class="status-dot" id="healthDot"></div>
+      <span id="healthText">Checking...</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card full-width">
+      <h2>DevSecOps Lab Dashboard</h2>
+      <p class="desc">Intentionally vulnerable demo application for PaaS security pipeline testing.</p>
+      <div class="badge-row">
+        <span class="badge">SCA CVEs</span>
+        <span class="badge">Trivy Image</span>
+        <span class="badge">SonarQube FAIL</span>
+        <span class="badge">Root Container</span>
+      </div>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="value" id="metricHealth">--</div>
+          <div class="label">Health Status</div>
+        </div>
+        <div class="metric">
+          <div class="value" id="metricEndpoints">10</div>
+          <div class="label">API Endpoints</div>
+        </div>
+        <div class="metric">
+          <div class="value" id="metricVersion">1.0.0</div>
+          <div class="label">Version</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Echo API</h2>
+      <p class="desc">Test the /api/echo endpoint with custom input.</p>
+      <label for="echoInput">Input</label>
+      <input type="text" id="echoInput" placeholder="Enter text to echo">
+      <button id="echoBtn">Send Echo</button>
+      <div class="output" id="echoOutput">Response will appear here</div>
+    </section>
+
+    <section class="card">
+      <h2>Login</h2>
+      <p class="desc">Authenticate via /api/login endpoint.</p>
+      <label for="loginUser">Username</label>
+      <input type="text" id="loginUser" placeholder="admin">
+      <label for="loginPass">Password</label>
+      <input type="password" id="loginPass" placeholder="password">
+      <button id="loginBtn">Login</button>
+      <div class="output" id="loginOutput">Token will appear here</div>
+    </section>
+
+    <section class="card">
+      <h2>Compliance</h2>
+      <p class="desc">Run compliance audit suite.</p>
+      <button id="complianceBtn">Run Compliance Check</button>
+      <div class="output" id="complianceOutput">Results will appear here</div>
+    </section>
+
+    <section class="card">
+      <h2>Process Value</h2>
+      <p class="desc">Test nested condition processing.</p>
+      <label for="processValue">Value (0-100)</label>
+      <input type="number" id="processValue" value="50" min="0" max="100">
+      <label for="processLevel">Access Level (1-10)</label>
+      <input type="number" id="processLevel" value="3" min="1" max="10">
+      <button id="processBtn">Process</button>
+      <div class="output" id="processOutput">Results will appear here</div>
+    </section>
+
+    <section class="card">
+      <h2>Template Render</h2>
+      <p class="desc">Render a Handlebars template server-side.</p>
+      <label for="templateInput">Template</label>
+      <input type="text" id="templateInput" value="Hello {{name}}!">
+      <label for="templateName">Name</label>
+      <input type="text" id="templateName" value="Lab User">
+      <button id="renderBtn">Render</button>
+      <div class="output" id="renderOutput">Rendered output here</div>
+    </section>
+
+    <section class="card">
+      <h2>Remote Fetch</h2>
+      <p class="desc">Fetch data from a remote URL via server proxy.</p>
+      <label for="fetchUrl">URL</label>
+      <input type="text" id="fetchUrl" value="https://httpbin.org/get">
+      <button id="fetchBtn">Fetch</button>
+      <div class="output" id="fetchOutput">Response will appear here</div>
+    </section>
+  </main>
+
+  <footer>Lab demo — intentional vulnerabilities</footer>
+  <script src="/app.js"></script>
+</body>
+</html>
